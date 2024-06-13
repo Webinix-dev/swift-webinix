@@ -1,0 +1,3 @@
+[submodule "Sources/webinix"]
+	path = Sources/webinix
+	url = https://github.com/webinix-dev/webinix.git
