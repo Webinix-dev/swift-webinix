@@ -1,11 +1,9 @@
-import webinix
+import SwiftWebinix
 
 let doc = "<html><head><script src='webinix.js'></script></head> Hello World</html>"
 
-let win = webinix_new_window()
+let win = newWindow()
 
-_ = doc.withCString { html in
-	webinix_show(win, UnsafeMutablePointer(mutating: html))
-}
+try! win.show(doc)
 
-webinix_wait()
+wait()

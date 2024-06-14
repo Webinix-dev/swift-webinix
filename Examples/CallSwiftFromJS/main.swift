@@ -1,4 +1,4 @@
-import webinix
+import SwiftWebinix
 
 let doc = """
 <!doctype html>
@@ -46,53 +46,48 @@ let doc = """
 </html>
 """
 
-func handleStr(e: UnsafeMutablePointer<webinix_event_t>?) {
-	let str1 = webinix_get_string(e)!
-	let str2 = webinix_get_string_at(e, 1)!
+func handleStr(_ e: Event) {
+	let str1: String = try! getArg(e)
+	let str2: String = try! getArg(e, 1)
 
-	print("handleStr 1: \(String(cString: str1))") // Hello
-	print("handleStr 2: \(String(cString: str2))") // World
+	print("handleStr 1: \(str1)") // Hello
+	print("handleStr 2: \(str2)") // World
 }
 
-func handleInt(e: UnsafeMutablePointer<webinix_event_t>?) {
-	let num1 = webinix_get_int_at(e, 0)
-	let num2 = webinix_get_int_at(e, 1)
-	let num3 = webinix_get_int_at(e, 2)
+func handleInt(e: Event) {
+	let num1: Int = try! getArg(e)
+	let num2: Int = try! getArg(e, 1)
+	let num3: Int = try! getArg(e, 2)
 
 	print("handleInt 1: \(num1)") // 123
 	print("handleInt 2: \(num2)") // 456
 	print("handleInt 3: \(num3)") // 789
 }
 
-func handleBool(e: UnsafeMutablePointer<webinix_event_t>?) {
-	let status1 = webinix_get_bool(e)
-	let status2 = webinix_get_bool_at(e, 1)
+func handleBool(e: Event) {
+	let status1: Bool = try! getArg(e)
+	let status2: Bool = try! getArg(e, 1)
 
 	print("handleBool 1: \(status1)") // true
 	print("handleBool 2: \(status2)") // false
 }
 
-func handleResp(e: UnsafeMutablePointer<webinix_event_t>?) {
-	let count = webinix_get_int(e)
-	webinix_return_int(e, count * 2)
+func handleResp(e: Event) {
+	let count: Int = try! getArg(e)
+	response(e, count * 2)
 }
 
 // Create a new window.
-let win = webinix_new_window()
+let win = newWindow()
 
 // Bind Swift functions.
-webinix_bind(win, "handleStr", handleStr)
-webinix_bind(win, "handleInt", handleInt)
-webinix_bind(win, "handleBool", handleBool)
-webinix_bind(win, "handleResp", handleResp)
+win.bind("handleStr", handleStr)
+win.bind("handleInt", handleInt)
+win.bind("handleBool", handleBool)
+win.bind("handleResp", handleResp)
 
 // Show html frontend.
-_ = doc.withCString { html in
-	webinix_show(win, UnsafeMutablePointer(mutating: html))
-}
+try! win.show(doc)
 
 // Wait until all windows get closed.
-webinix_wait()
-
-// Free resources (optional).
-webinix_clean()
+wait()
