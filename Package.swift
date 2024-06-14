@@ -72,5 +72,10 @@ let package = Package(
 			dependencies: ["SwiftWebinix"],
 			path: "Examples/CallSwiftFromJS"
 		),
+		.executableTarget(
+			name: "ServeAFolder",
+			dependencies: ["SwiftWebinix"],
+			path: "Examples/ServeAFolder"
+		),
 	]
 )
