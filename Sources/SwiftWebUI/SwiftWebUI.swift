@@ -1,11 +1,33 @@
+import Foundation
 import webinix
 
-public typealias Event = UnsafeMutablePointer<webinix_event_t>?
+public typealias BindCallback = (Event) -> Void
 
-public typealias BindCallback = @convention(c) (Event) -> Void
+var callbacks: [Int: BindCallback] = [:]
 
 enum WebinixError: Error {
 	case runtimeError(String)
+}
+
+func swiftEventHandler(_ event: UnsafeMutablePointer<webinix_event_t>?) {
+	let e = event?.pointee
+	guard let window = e?.window,
+	      let eventType = e?.event_type,
+	      let element = e?.element,
+	      let eventNumber = e?.event_number,
+	      let bindId = e?.bind_id
+	else {
+		return
+	}
+	let swiftEvent = Event(
+		window: window,
+		eventType: eventType,
+		element: element,
+		eventNumber: eventNumber,
+		bindId: bindId
+	)
+	// Call user callback function.
+	callbacks[swiftEvent.bindId]?(swiftEvent)
 }
 
 public final class Window {
@@ -20,8 +42,10 @@ public final class Window {
 	/// - Parameters:
 	///   - element: The name under which the function will be callable / the HTML elements ID.
 	///   - callback: The callback function.
-	public func bind(_ element: String, _ callback: BindCallback) {
-		webinix_bind(id, element, callback)
+	// public func bind(_ element: String, _ callback: BindCallbackSwift) {
+	public func bind(_ element: String, _ callback: @escaping BindCallback) {
+		let id = webinix_bind(id, element, swiftEventHandler)
+		callbacks[id] = callback
 	}
 
 	/// Shows a window using embedded HTML, or a file.
@@ -29,9 +53,7 @@ public final class Window {
 	/// - Parameter html: The HTML, URL, or a local file.
 	/// - Throws: `WebinixError.runtimeError` if showing the window was not successful.
 	public func show(_ html: String) throws {
-		if !(html.withCString { html in
-			webinix_show(id, html)
-		}) {
+		if !(html.withCString { html in webinix_show(id, html) }) {
 			throw WebinixError.runtimeError("error: failed to show window")
 		}
 	}
@@ -54,9 +76,7 @@ public final class Window {
 	/// Sets windows root folder.
 	/// - Parameter path: The local folder full path.
 	public func setRootFolder(_ path: String) throws {
-		if !(path.withCString { p in
-			webinix_set_root_folder(id, p)
-		}) {
+		if !(path.withCString { p in webinix_set_root_folder(id, p) }) {
 			throw WebinixError.runtimeError("error: failed to set root folder for window `\(id)`")
 		}
 	}
@@ -67,6 +87,24 @@ public final class Window {
 		script.withCString { script in
 			webinix_run(id, script)
 		}
+	}
+}
+
+public struct Event {
+	let cStruct: webinix_event_t
+	let id: Int
+	public let window: Int
+	public let eventType: Int
+	public let element: String
+	public let bindId: Int
+
+	init(window: Int, eventType: Int, element: UnsafeMutablePointer<CChar>?, eventNumber: Int, bindId: Int) {
+		cStruct = webinix_event_t(window: window, event_type: eventType, element: element, event_number: eventNumber, bind_id: bindId)
+		id = eventNumber
+		self.window = window
+		self.eventType = eventType
+		self.element = String(cString: element!)
+		self.bindId = bindId
 	}
 }
 
@@ -105,19 +143,20 @@ public func clean() {
 ///   - event: The event object.
 ///   - idx: The argument position starting from 0.
 public func getArg<T>(_ event: Event, _ idx: Int = 0) throws -> T {
-	let arg_count = webinix_get_count(event)
+	var cEvent = event.cStruct
+	let arg_count = webinix_get_count(&cEvent)
 	if idx >= arg_count {
 		throw WebinixError.runtimeError("error: argument index out of range (index: \(idx), argument count: \(arg_count))")
 	}
 	if T.self == String.self {
-		let str = webinix_get_string_at(event, idx)!
+		let str = webinix_get_string_at(&cEvent, idx)!
 		return String(cString: str) as! T
 	} else if T.self == Int.self {
-		return Int(webinix_get_int_at(event, idx)) as! T
+		return Int(webinix_get_int_at(&cEvent, idx)) as! T
 	} else if T.self == Bool.self {
-		return webinix_get_bool_at(event, idx) as! T
+		return webinix_get_bool_at(&cEvent, idx) as! T
 	} else if T.self == Double.self {
-		return webinix_get_float_at(event, idx) as! T
+		return webinix_get_float_at(&cEvent, idx) as! T
 	}
 	// TODO: automatically decode other types.
 	throw WebinixError.runtimeError("error: failed to get argument at index `\(idx)`")
@@ -128,16 +167,15 @@ public func getArg<T>(_ event: Event, _ idx: Int = 0) throws -> T {
 ///   - event: The event object.
 ///   - value: The response value.
 public func response<T>(_ event: Event, _ value: T) {
+	var cEvent = event.cStruct
 	if value is String {
-		(value as! String).withCString { str in
-			webinix_return_string(event, str)
-		}
+		(value as! String).withCString { str in webinix_return_string(&cEvent, str) }
 	} else if value is Int {
-		webinix_return_int(event, Int64(value as! Int))
+		webinix_return_int(&cEvent, Int64(value as! Int))
 	} else if value is Bool {
-		webinix_return_bool(event, value as! Bool)
+		webinix_return_bool(&cEvent, value as! Bool)
 	} else if value is Double {
-		webinix_return_float(event, value as! Double)
+		webinix_return_float(&cEvent, value as! Double)
 	}
 	// TODO: automatically encode other types as JSON string.
 }
