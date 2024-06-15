@@ -59,6 +59,7 @@ let package = Package(
 			sources: [
 				"src/webinix.c",
 				"src/civetweb/civetweb.c",
+				"src/webview/wkwebview.m",
 			],
 			cSettings: webinixCSettings,
 			linkerSettings: webinixLinkerSettings
