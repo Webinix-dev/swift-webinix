@@ -77,7 +77,10 @@ let package = Package(
 		.executableTarget(
 			name: "ServeAFolder",
 			dependencies: ["SwiftWebinix"],
-			path: "Examples/ServeAFolder"
+			path: "Examples/ServeAFolder",
+			resources: [
+				.copy("ui"),
+			]
 		),
 	]
 )
