@@ -130,6 +130,24 @@ public struct Event {
 		// TODO: automatically decode other types.
 		throw WebinixError.runtimeError("error: failed to get argument at index `\(idx)`")
 	}
+
+	/// Returns a response to JavaScript.
+	/// - Parameters:
+	///   - event: The event object.
+	///   - value: The response value.
+	public func response<T>(_ value: T) {
+		var cEvent = cStruct
+		if value is String {
+			(value as! String).withCString { str in webinix_return_string(&cEvent, str) }
+		} else if value is Int {
+			webinix_return_int(&cEvent, Int64(value as! Int))
+		} else if value is Bool {
+			webinix_return_bool(&cEvent, value as! Bool)
+		} else if value is Double {
+			webinix_return_float(&cEvent, value as! Double)
+		}
+		// TODO: automatically encode other types as JSON string.
+	}
 }
 
 /// Creates a new window object.
@@ -160,24 +178,6 @@ public func exit() {
 /// Frees all memory resources. Should be called only at the end.
 public func clean() {
 	webinix_clean()
-}
-
-/// Returns a response to JavaScript.
-/// - Parameters:
-///   - event: The event object.
-///   - value: The response value.
-public func response<T>(_ event: Event, _ value: T) {
-	var cEvent = event.cStruct
-	if value is String {
-		(value as! String).withCString { str in webinix_return_string(&cEvent, str) }
-	} else if value is Int {
-		webinix_return_int(&cEvent, Int64(value as! Int))
-	} else if value is Bool {
-		webinix_return_bool(&cEvent, value as! Bool)
-	} else if value is Double {
-		webinix_return_float(&cEvent, value as! Double)
-	}
-	// TODO: automatically encode other types as JSON string.
 }
 
 /// Sets the web-server root folder path for all windows.
