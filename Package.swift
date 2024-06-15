@@ -10,6 +10,10 @@ var webinixCSettings: [CSetting] = [
 	.define("NO_CGI"),
 	.define("USE_WEBSOCKET"),
 ]
+var webinixSources = [
+	"src/webinix.c",
+	"src/civetweb/civetweb.c",
+]
 var webinixLinkerSettings: [LinkerSetting] = [
 	.linkedLibrary("Ws2_32", .when(platforms: [.windows])),
 	.linkedLibrary("Ole32", .when(platforms: [.windows])),
@@ -35,6 +39,10 @@ if ProcessInfo.processInfo.environment["USE_TLS"] != nil {
 	]
 }
 
+#if os(macOS)
+	webinixSources += ["src/webview/wkwebview.m"]
+#endif
+
 let package = Package(
 	name: "SwiftWebinix",
 	products: [
@@ -56,11 +64,7 @@ let package = Package(
 				"bridge",
 				"CMakeLists.txt",
 			],
-			sources: [
-				"src/webinix.c",
-				"src/civetweb/civetweb.c",
-				"src/webview/wkwebview.m",
-			],
+			sources: webinixSources,
 			cSettings: webinixCSettings,
 			linkerSettings: webinixLinkerSettings
 		),
