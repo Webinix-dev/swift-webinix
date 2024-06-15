@@ -48,7 +48,7 @@ try! win.show(doc)
 wait()
 ```
 
-Find more examples in the [`examples/`](https://github.com/webinix-dev/swift-webinix/tree/main/examples) directory.
+Find more examples in the [`Examples/`](https://github.com/webinix-dev/swift-webinix/tree/main/Examples) directory.
 
 After cloning the repository, examples can be run from the repository root.
 
