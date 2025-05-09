@@ -1,6 +1,6 @@
 <div align="center">
 
-![Logo](https://raw.githubusercontent.com/webinix-dev/webinix-logo/main/webinix_swift.png)
+
 
 # Swift-Webinix
 
@@ -8,20 +8,8 @@
 
 #### [Features](#features) · [Usage](#usage) · [Webinix](https://github.com/webinix-dev/webinix)
 
-[build-status]: https://img.shields.io/github/actions/workflow/status/webinix-dev/swift-webinix/ci.yml?branch=main&style=for-the-badge&logo=swift&labelColor=414868&logoColor=C0CAF5
-[license]: https://img.shields.io/github/license/webinix-dev/swift-webinix?style=for-the-badge&logo=opensourcehardware&label=License&logoColor=C0CAF5&labelColor=414868&color=8c73cc
-
-<!-- [release-version]: https://img.shields.io/github/v/tag/webinix-dev/swift-webinix?style=for-the-badge&logo=webtrees&logoColor=C0CAF5&labelColor=414868&color=7664C6 -->
-
-[![][build-status]](https://github.com/webinix-dev/swift-webinix/actions?query=branch%3Amain)
-[![][license]](https://github.com/webinix-dev/swift-webinix/blob/main/LICENSE)
-
-<!-- [![][release-version]](https://github.com/webinix-dev/swift-webinix/releases/latest) -->
-
 > Use any web browser or WebView as GUI.\
 > With Swift in the backend and modern web technologies in the frontend.
-
-![Screenshot](https://raw.githubusercontent.com/webinix-dev/webinix-logo/main/screenshot.png)
 
 </div>
 
@@ -73,8 +61,6 @@ swift run CallSwiftFromJS
 
 <div align="center">
 
-![CPPCon](https://github.com/webinix-dev/webinix/assets/34311583/4e830caa-4ca0-44ff-825f-7cd6d94083c8)
-
 </div>
 
 Web application UI design is not just about how a product looks but how it works. Using web technologies in your UI makes your product modern and professional, And a well-designed web application will help you make a solid first impression on potential customers. Great web application design also assists you in nurturing leads and increasing conversions. In addition, it makes navigating and using your web app easier for your users.
@@ -86,8 +72,6 @@ Today's web browsers have everything a modern UI needs. Web browsers are very so
 ### How Does it Work?
 
 <div align="center">
-
-![Diagram](https://github.com/ttytm/webinix/assets/34311583/dbde3573-3161-421e-925c-392a39f45ab3)
 
 </div>
 
